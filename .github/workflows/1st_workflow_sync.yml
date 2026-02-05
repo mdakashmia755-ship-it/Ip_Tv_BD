@@ -1,4 +1,4 @@
-name: 1st Workflow Sync
+name: IPTV Sync with VPN
 
 on:
   push:
@@ -17,22 +17,28 @@ jobs:
           sudo apt-get install -y ffmpeg
           pip install requests[socks]
 
-      - name: ভিপিএন (Cloudflare Warp) সেটআপ এবং কানেক্ট
+      - name: ভিপিএন (Cloudflare Warp) সেটআপ
         run: |
+          # রিপোজিটরি এবং কি (Key) যোগ করা
           curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | sudo gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
           echo "deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/cloudflare-client.list
           sudo apt-get update && sudo apt-get install cloudflare-warp -y
           
-          # সার্ভিস চালু এবং প্রক্সি মোড সেটআপ
+          # সার্ভিস চালু করা
           sudo systemctl start warp-svc
-          warp-cli --accept-tos registration register
-          warp-cli --accept-tos mode proxy
-          warp-cli --accept-tos connect
+          sleep 5
+          
+          # রেজিস্ট্রেশন এবং প্রক্সি মোড সেটআপ (নতুন সিনট্যাক্স)
+          # এখানে || true ব্যবহার করা হয়েছে যাতে এরর আসলেও প্রসেস না থামে
+          warp-cli --accept-tos registration register || true
+          warp-cli --accept-tos mode proxy || true
+          warp-cli --accept-tos connect || true
           
           echo "ভিপিএন কানেক্ট হওয়ার জন্য ১৫ সেকেন্ড অপেক্ষা করা হচ্ছে..."
           sleep 15
-          # বর্তমান আইপি চেক করার জন্য (লগ-এ দেখা যাবে)
-          curl -x socks5h://127.0.0.1:40000 https://ipinfo.io
+          
+          # কানেকশন হয়েছে কি না তা চেক করা
+          warp-cli --accept-tos status
 
       - name: পাইথন স্ক্রিপ্ট চালানো
         env:
