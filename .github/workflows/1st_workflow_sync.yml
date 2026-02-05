@@ -1,20 +1,42 @@
 name: 1st Workflow Sync
+
 on:
   push:
     paths: ['**.txt']
   workflow_dispatch:
+
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      # ১. FFmpeg ইনস্টল (যদি আপনার স্ক্রিপ্টে FFmpeg এর প্রয়োজন থাকে)
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
-      - run: pip install requests
+
+      # ২. পাইথন লাইব্রেরি ইনস্টল
+      - name: Install Dependencies
+        run: pip install requests
+
+      # ৩. VPN (Cloudflare Warp) সেটআপ - এটি বাংলাদেশি সোর্স চেক করতে সাহায্য করবে
+      - name: Setup and Connect VPN
+        run: |
+          curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | sudo gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
+          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ jammy main" | sudo tee /etc/apt/sources.list.d/cloudflare-client.list
+          sudo apt-get update && sudo apt-get install cloudflare-warp -y
+          warp-cli --accept-tos register
+          warp-cli --accept-tos connect
+          echo "VPN কানেক্ট হওয়ার জন্য ১০ সেকেন্ড অপেক্ষা করা হচ্ছে..."
+          sleep 10
+
+      # ৪. মূল স্ক্রিপ্ট রান করা
       - name: Run Script
         env:
           MY_PAT_TOKEN: ${{ secrets.MY_PAT_TOKEN }}
         run: python source_manager.py
+
+      # ৫. পরিবর্তনগুলো গিটহাবে পুশ করা
       - name: Push Changes
         run: |
           git config --local user.email "bot@github.com"
