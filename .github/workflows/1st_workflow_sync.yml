@@ -1,4 +1,4 @@
-name: IPTV Sync with VPN
+name: 1st Workflow Sync
 
 on:
   push:
@@ -28,8 +28,8 @@ jobs:
           sudo systemctl start warp-svc
           sleep 5
           
-          # রেজিস্ট্রেশন এবং প্রক্সি মোড সেটআপ (নতুন সিনট্যাক্স)
-          # এখানে || true ব্যবহার করা হয়েছে যাতে এরর আসলেও প্রসেস না থামে
+          # রেজিস্ট্রেশন এবং প্রক্সি মোড সেটআপ
+          # || true দেওয়া হয়েছে যাতে এরর আসলেও প্রসেস না থামে
           warp-cli --accept-tos registration register || true
           warp-cli --accept-tos mode proxy || true
           warp-cli --accept-tos connect || true
@@ -37,7 +37,7 @@ jobs:
           echo "ভিপিএন কানেক্ট হওয়ার জন্য ১৫ সেকেন্ড অপেক্ষা করা হচ্ছে..."
           sleep 15
           
-          # কানেকশন হয়েছে কি না তা চেক করা
+          # কানেকশন স্ট্যাটাস চেক
           warp-cli --accept-tos status
 
       - name: পাইথন স্ক্রিপ্ট চালানো
@@ -46,9 +46,24 @@ jobs:
         run: python source_manager.py
 
       - name: পরিবর্তনগুলো সেভ (Push) করা
+        env:
+          TOKEN: ${{ secrets.MY_PAT_TOKEN }}
         run: |
+          # গিট কনফিগার করা
           git config --local user.email "bot@github.com"
           git config --local user.name "Source-Bot"
+          
+          # ফাইল অ্যাড এবং কমিট করা
           git add database.json
-          git commit -m "Update Store: $(date)" || exit 0
-          git push
+          
+          # যদি কোনো পরিবর্তন না থাকে তবে বের হয়ে যাবে
+          if git diff --quiet && git diff --staged --quiet; then
+            echo "কোনো পরিবর্তন নেই, পুশ করার দরকার নেই।"
+            exit 0
+          else
+            git commit -m "Update Store: $(date)"
+          fi
+          
+          # Exit Code 128 ফিক্স করার জন্য টোকেন সহ রিমোট সেটআপ
+          git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}.git
+          git push origin HEAD:${{ github.ref_name }}
