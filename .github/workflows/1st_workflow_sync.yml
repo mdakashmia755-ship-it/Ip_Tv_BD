@@ -1,0 +1,20 @@
+name: Source Sync
+on:
+  push:
+    paths: ['**.txt'] # টেক্সট ফাইল আপডেট হলেই চলবে
+  workflow_dispatch:
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - run: pip install requests
+      - run: python source_manager.py
+      - name: Save
+        run: |
+          git config --local user.email "bot@github.com"
+          git config --local user.name "Source-Bot"
+          git add database.json
+          git commit -m "Update Store" || exit 0
+          git push
