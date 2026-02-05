@@ -1,0 +1,26 @@
+name: Auto Cleaner
+on:
+  schedule:
+    - cron: '0 */4 * * *' # প্রতি ৪ ঘণ্টা পর পর স্বয়ংক্রিয়ভাবে চলবে
+  workflow_dispatch:
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - run: pip install requests
+      - run: python cleaner_logic.py
+      - name: Trigger Source Sync # লিংক ডিলিট হলে নতুন লিংক খুঁজতে ১ম টাকে ডাকবে
+        run: |
+          curl -X POST -H "Authorization: token ${{ secrets.MY_PAT_TOKEN }}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          https://api.github.com/repos/${{ github.repository }}/actions/workflows/1st_workflow_sync.yml/dispatches \
+          -d '{"ref":"main"}'
+      - name: Save
+        run: |
+          git config --local user.email "bot@github.com"
+          git config --local user.name "Cleaner-Bot"
+          git add database.json playlist.m3u
+          git commit -m "Cleanup and Fix" || exit 0
+          git push
