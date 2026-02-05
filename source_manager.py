@@ -10,7 +10,7 @@ def is_video_playing(url):
     except: return False
 
 # কনফিগারেশন
-TOKEN = "YOUR_GITHUB_PAT_TOKEN" # এখানে আপনার টোকেন বসাবেন
+TOKEN = "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" # এখানে আপনার টোকেন বসাবেন
 REPO_OWNER = "mdakashmia755-ship-it"
 PRIVATE_REPO = "cheekiptvtxt"
 SOURCES = ["https://raw.githubusercontent.com/iptv-org/iptv/master/streams/bd.m3u"]
