@@ -1,0 +1,32 @@
+{
+    "ATN Bangla": [
+        {
+            "link": "https://owrcovcrpy.gpcdn.net/bpk-tv/1722/output/1722-audio_113522_eng=113200-video=2202800.m3u8",
+            "logo": "https://i.ibb.co/F41Zgxyr/ATN-Bangla.jpg"
+        }
+    ],
+    "ATN News": [
+        {
+            "link": "https://owrcovcrpy.gpcdn.net/bpk-tv/1706/output/index.m3u8",
+            "logo": "https://i.postimg.cc/PxyNJrGm/ATN-News.jpg"
+        }
+    ],
+    "Banglavision": [
+        {
+            "link": "https://owrcovcrpy.gpcdn.net/bpk-tv/1715/output/1715-audio_113452_eng=113200-video=2202800.m3u8",
+            "logo": "https://i.ibb.co/h1fRcgM2/Banglavision.jpg"
+        }
+    ],
+    "BTV": [
+        {
+            "link": "https://owrcovcrpy.gpcdn.net/bpk-tv/1709/output/master.m3u8",
+            "logo": "https://i.postimg.cc/cJHPmjNJ/BTV.jpg"
+        }
+    ],
+    "Channel 24": [
+        {
+            "link": "https://owrcovcrpy.gpcdn.net/bpk-tv/1703/output/1703-audio_113332_eng=113200-video=2202800.m3u8",
+            "logo": "https://i.postimg.cc/C1CCfh6n/Channel-24.jpg"
+        }
+    ]
+}
